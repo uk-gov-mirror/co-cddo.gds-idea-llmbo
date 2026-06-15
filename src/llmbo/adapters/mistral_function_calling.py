@@ -71,18 +71,64 @@ class MistralFunctionAdapter(ModelProviderAdapter):
     def validate_result(cls, result: dict[str, Any], output_model: type[BaseModel]) -> BaseModel | None:
         cls.logger.debug(f"Validating result against {output_model.__name__} schema")
 
+        # Check we have choices
         choices = result.get("choices", [])
         if not choices:
+            cls.logger.debug("No expected 'choices' key in result.")
+            return None
+        
+        choice = choices[0]
+        
+        # Check that we stopped on purpose
+        finish_reason = choice.get("finish_reason", "")
+        if finish_reason != "tool_calls":
+            cls.logger.debug(
+                f"Expected 'tool_calls' as finish_reason, got '{finish_reason}'."
+            )
             return None
 
-        tools = choices[0].get("message", {}).get("tool_calls", [])
+        # Check that the assistant returned a message
+        message = choice.get("message", {})
+        if message.get("role", "") != "assistant":
+            cls.logger.debug("Did not get the expected 'assistant' role.")
+            return None
+
+        # Check that the assistant returned tool calls
+        tools = message.get("tool_calls", [])
         if not tools:
+            cls.logger.debug("No tool calls found in assistant message.")
+            return None
+
+        if len(tools) != 1:
+            cls.logger.debug(
+                f"Expected exactly 1 tool call, got {len(tools)}."
+            )
+            return None
+        
+        # Check tool name matches expected model
+        function = tools[0].get("function", {})
+        tool_name = function.get("name", "")
+        if tool_name != output_model.__name__:
+            cls.logger.debug(
+                f"Wrong tool name in response, expected "
+                f"'{output_model.__name__}' got '{tool_name}'."
+            )
+            return None
+
+        # Parse and validate arguments
+        try:
+            arguments = function.get("arguments", "{}")
+            parsed_arguments = json.loads(arguments)
+        except json.JSONDecodeError:
+            cls.logger.debug(
+                f"Failed to parse function arguments as JSON: {arguments}"
+            )
             return None
 
         try:
-            arguments = tools[0].get("function", {}).get("arguments", {})
-            parsed_arguments = json.loads(arguments)
-            return output_model(**parsed_arguments)
-        except (json.JSONDecodeError, ValidationError) as e:
+            validated_model = output_model(**parsed_arguments)
+            cls.logger.debug("Validation successful.")
+            return validated_model
+        except ValidationError as e:
             cls.logger.debug(f"Validation failed: {e!s}")
             return None
