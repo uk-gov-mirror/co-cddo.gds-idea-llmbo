@@ -1,12 +1,12 @@
 from .adapters import (
-    AnthropicAdapter, 
-    MistralAdapter,
-    MistralFunctionAdapter, 
-    DeepSeekAdapter, 
+    AnthropicAdapter,
+    DeepSeekAdapter,
     LlamaAdapter,
+    MistralAdapter,
+    MistralFunctionAdapter,
+    NovaAdapter,
     OpenAIAdapter,
     QwenAdapter,
-    NovaAdapter,
 )
 from .batch_inferer import BatchInferer
 from .models import (

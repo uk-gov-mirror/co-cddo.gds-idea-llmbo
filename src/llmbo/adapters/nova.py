@@ -42,10 +42,10 @@ class NovaAdapter(ModelProviderAdapter):
 
         schema = output_model.model_json_schema()
         properties = schema.get("properties", {})
-        
+
         # Inline the $defs to prevent the "lazy pointer" issue we saw with OSS models
         if "$defs" in schema:
-            for prop_name, prop_val in properties.items():
+            for _, prop_val in properties.items():
                 if prop_val.get("type") == "array" and "$ref" in prop_val.get("items", {}):
                     ref_name = prop_val["items"]["$ref"].split("/")[-1]
                     if ref_name in schema["$defs"]:
@@ -129,7 +129,7 @@ class NovaAdapter(ModelProviderAdapter):
         return model_input
 
     @classmethod
-    def validate_result(cls, result: dict[str, Any], output_model: type[BaseModel]) -> BaseModel | None:  
+    def validate_result(cls, result: dict[str, Any], output_model: type[BaseModel]) -> BaseModel | None:
         """Validate and parse output from Amazon Nova's Converse API.
 
         Searches the response content blocks for a ``toolUse`` entry

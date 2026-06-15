@@ -11,7 +11,7 @@ from .base import ModelProviderAdapter
 
 class LlamaAdapter(ModelProviderAdapter):
     """Adapter for Meta Llama models (Llama 3 / 4) in AWS Bedrock.
-    
+
     This adapter handles:
     1. Formatting the prompt using Meta's specific header tokens.
     2. Enforcing JSON-only schema outputs.
@@ -39,7 +39,7 @@ class LlamaAdapter(ModelProviderAdapter):
         """
 
         prompt_parts = ["<|begin_of_text|>"]
-        
+
         if system_prompt or tools:
             prompt_parts.append("<|start_header_id|>system<|end_header_id|>\n\n")
             if system_prompt:
@@ -51,10 +51,10 @@ class LlamaAdapter(ModelProviderAdapter):
                     f"The JSON object must follow this exact schema:\n{tools}\n"
                 )
             prompt_parts.append("<|eot_id|>")
-        
+
         prompt_parts.append(f"<|start_header_id|>user<|end_header_id|>\n\n{user_prompt}<|eot_id|>")
         prompt_parts.append("<|start_header_id|>assistant<|end_header_id|>\n\n")
-        
+
         return "".join(prompt_parts)
 
     @staticmethod
@@ -87,15 +87,15 @@ class LlamaAdapter(ModelProviderAdapter):
 
         original_prompt = model_input.messages[0].get("content", "") if model_input.messages else ""
         tool = cls._schema_to_string(output_model) if output_model else None
-        
+
         # Build the native prompt string
         system = model_input.system if isinstance(model_input.system, str) else None
         formatted_prompt = cls.format_llama_prompt(original_prompt, system, tool)
-        
+
         # Inject the native Llama keys dynamically
         requested_tokens = model_input.max_tokens or 2048
-        safe_max_gen_len = min(requested_tokens, 8192) 
-        
+        safe_max_gen_len = min(requested_tokens, 8192)
+
         model_input.prompt = formatted_prompt
         model_input.max_gen_len = safe_max_gen_len
 
@@ -106,7 +106,7 @@ class LlamaAdapter(ModelProviderAdapter):
         model_input.anthropic_version = None
         model_input.tools = None
         model_input.tool_choice = None
-        
+
         return model_input
 
     @classmethod

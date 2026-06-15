@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from conftest import ExampleOutput
+from pydantic import BaseModel
 
 from llmbo.adapters import NovaAdapter
 from llmbo.models import ModelInput

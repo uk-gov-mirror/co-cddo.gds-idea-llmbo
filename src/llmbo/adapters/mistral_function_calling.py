@@ -45,7 +45,7 @@ class MistralFunctionAdapter(ModelProviderAdapter):
             "properties": schema.get("properties", {}),
             "required": schema.get("required", []),
         }
-        
+
         # Keep nested definitions if Pydantic generated them
         if "$defs" in schema:
             parameters["$defs"] = schema["$defs"]
@@ -86,10 +86,10 @@ class MistralFunctionAdapter(ModelProviderAdapter):
         if model_input.system and isinstance(model_input.system, str):
             if not model_input.messages:
                 model_input.messages = []
-            
+
             # Prepend the system prompt to the messages list
             model_input.messages.insert(0, {"role": "system", "content": model_input.system})
-            
+
             # Delete the top-level key so AWS doesn't throw the 'extra_forbidden' error
             model_input.system = None
         # -----------------------------
@@ -102,7 +102,7 @@ class MistralFunctionAdapter(ModelProviderAdapter):
             cls.logger.debug(f"Adding tool definition for {output_model.__name__}")
             model_input.tools = [cls.build_tool(output_model)]
             model_input.tool_choice = "any"
-            
+
         return model_input
 
     @classmethod
@@ -130,9 +130,9 @@ class MistralFunctionAdapter(ModelProviderAdapter):
         if not choices:
             cls.logger.debug("No expected 'choices' key in result.")
             return None
-        
+
         choice = choices[0]
-        
+
         # Check that we stopped on purpose
         finish_reason = choice.get("finish_reason", "")
         if finish_reason != "tool_calls":
@@ -158,7 +158,7 @@ class MistralFunctionAdapter(ModelProviderAdapter):
                 f"Expected exactly 1 tool call, got {len(tools)}."
             )
             return None
-        
+
         # Check tool name matches expected model
         function = tools[0].get("function", {})
         tool_name = function.get("name", "")
