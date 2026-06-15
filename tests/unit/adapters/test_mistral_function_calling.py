@@ -82,6 +82,7 @@ def test_validate_result_valid():
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [
                         {
@@ -114,7 +115,7 @@ def test_validate_result_bad_message(caplog):
 
 
 def test_validate_result_no_tool_use(caplog):
-    """Test the correct None and log is returned for an invalid message."""
+    """Test the correct None and log is returned for wrong finish reason."""
     invalid_result = {
         "choices": [
             {
@@ -126,7 +127,7 @@ def test_validate_result_no_tool_use(caplog):
         result = MistralFunctionAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
-    assert "Finish reason was not 'tool_choice'" in caplog.text
+    assert "Expected 'tool_calls' as finish_reason" in caplog.text
 
 
 def test_validate_result_empty_tool_calls(caplog):
@@ -136,6 +137,7 @@ def test_validate_result_empty_tool_calls(caplog):
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [],
                 },
@@ -146,16 +148,17 @@ def test_validate_result_empty_tool_calls(caplog):
         result = MistralFunctionAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
-    assert "No tool_calls in message" in caplog.text
+    assert "No tool calls found in assistant message." in caplog.text
 
 
 def test_validate_result_too_many_tool_calls(caplog):
-    """Test validate_result with no tool calls."""
+    """Test validate_result with too many tool calls."""
     invalid_result = {
         "choices": [
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [0, 1, 2],
                 },
@@ -166,7 +169,7 @@ def test_validate_result_too_many_tool_calls(caplog):
         result = MistralFunctionAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
-    assert "Too many (3) tools called." in caplog.text
+    assert "Expected exactly 1 tool call, got 3." in caplog.text
 
 
 def test_validate_result_wrong_tool(caplog):
@@ -176,6 +179,7 @@ def test_validate_result_wrong_tool(caplog):
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [
                         {
@@ -195,19 +199,17 @@ def test_validate_result_wrong_tool(caplog):
         result = MistralFunctionAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
-    assert "Wrong tool encountered, expected ExampleOutput got WrongName." in caplog.text
+    assert "Wrong tool name in response, expected" in caplog.text
 
 
 def test_validate_result_invalid_json(caplog):
-    """Test validate_result with bad json.
-
-    age should be an integer, here is is a string.
-    """
+    """Test validate_result with bad json."""
     invalid_result = {
         "choices": [
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [
                         {
@@ -231,15 +233,13 @@ def test_validate_result_invalid_json(caplog):
 
 
 def test_validate_result_invalid_schema(caplog):
-    """Test validate_result with schema validation failure.
-
-    age should be an integer, here is is a string.
-    """
+    """Test validate_result with schema validation failure."""
     invalid_result = {
         "choices": [
             {
                 "finish_reason": "tool_calls",
                 "message": {
+                    "role": "assistant",
                     "tool_call_id": None,
                     "tool_calls": [
                         {
