@@ -2,6 +2,7 @@ from .anthropic import AnthropicAdapter
 from .base import DefaultAdapter, ModelProviderAdapter
 from .mistral import MistralAdapter
 from .mistral_function_calling import MistralFunctionAdapter
+from .openai_compatible import OpenAICompatibleAdapter
 from .deepseek import DeepSeekAdapter
 from .llama import LlamaAdapter
 from .openai_oss import OpenAIAdapter
@@ -15,6 +16,7 @@ __all__ = [
     "MistralAdapter",
     "MistralFunctionAdapter",
     "ModelProviderAdapter",
+    "OpenAICompatibleAdapter",
     "DeepSeekAdapter",
     "LlamaAdapter",
     "OpenAIAdapter",
