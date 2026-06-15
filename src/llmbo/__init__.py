@@ -1,5 +1,6 @@
 from .adapters import (
     AnthropicAdapter, 
+    MistralAdapter,
     MistralFunctionAdapter, 
     DeepSeekAdapter, 
     LlamaAdapter,
@@ -32,10 +33,18 @@ ModelAdapterRegistry.register(r"(amazon\.nova)", NovaAdapter)
 
 
 __all__ = [
+    "AnthropicAdapter",
     "BatchInferer",
+    "DeepSeekAdapter",
+    "LlamaAdapter",
     "Manifest",
+    "MistralAdapter",
+    "MistralFunctionAdapter",
     "ModelAdapterRegistry",
     "ModelInput",
+    "NovaAdapter",
+    "OpenAIAdapter",
+    "QwenAdapter",
     "StructuredBatchInferer",
     "ToolChoice",
     "__version__",
