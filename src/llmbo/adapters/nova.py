@@ -68,7 +68,7 @@ class NovaAdapter(ModelProviderAdapter):
 
         # 3. Reshape max_tokens into inferenceConfig
         if getattr(model_input, "max_tokens", None):
-            setattr(model_input, "inferenceConfig", {"maxTokens": model_input.max_tokens})
+            model_input.inferenceConfig = {"maxTokens": model_input.max_tokens}
             model_input.max_tokens = None
 
         # 4. Reshape tools into toolConfig
@@ -81,7 +81,7 @@ class NovaAdapter(ModelProviderAdapter):
                 }
             }
             # Dynamically attach the toolConfig and delete the legacy keys
-            setattr(model_input, "toolConfig", tool_config)
+            model_input.toolConfig = tool_config
             model_input.tools = None
             model_input.tool_choice = None
 

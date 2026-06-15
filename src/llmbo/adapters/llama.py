@@ -42,9 +42,9 @@ class LlamaAdapter(ModelProviderAdapter):
         
         return "".join(prompt_parts)
 
-    @classmethod
-    def build_tool(cls, output_model: type[BaseModel]) -> str:
-        """Stringifies the Pydantic schema for prompt injection."""
+    @staticmethod
+    def _schema_to_string(output_model: type[BaseModel]) -> str:
+        """Serialise a Pydantic model's JSON schema for prompt injection."""
         schema = output_model.model_json_schema()
         return json.dumps(schema, indent=2)
 
@@ -53,18 +53,19 @@ class LlamaAdapter(ModelProviderAdapter):
         cls.logger.debug("Preparing model input for Meta Llama")
 
         original_prompt = model_input.messages[0].get("content", "") if model_input.messages else ""
-        tool = cls.build_tool(output_model) if output_model else None
+        tool = cls._schema_to_string(output_model) if output_model else None
         
         # Build the native prompt string
-        formatted_prompt = cls.format_llama_prompt(original_prompt, model_input.system, tool)
+        system = model_input.system if isinstance(model_input.system, str) else None
+        formatted_prompt = cls.format_llama_prompt(original_prompt, system, tool)
         
         # Inject the native Llama keys dynamically
         requested_tokens = model_input.max_tokens or 2048
         safe_max_gen_len = min(requested_tokens, 8192) 
         
-        setattr(model_input, "prompt", formatted_prompt)
-        setattr(model_input, "max_gen_len", safe_max_gen_len)
-        
+        model_input.prompt = formatted_prompt
+        model_input.max_gen_len = safe_max_gen_len
+
         # Nullify the Anthropic/Converse keys so Bedrock doesn't reject them
         model_input.messages = None
         model_input.system = None
