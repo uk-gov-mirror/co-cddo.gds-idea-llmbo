@@ -69,7 +69,6 @@ class ModelInput:
             Converse API models (e.g. Nova).
     """
 
-
     # These are required
     messages: list[dict] | None = None
     anthropic_version: str | None = "bedrock-2023-05-31"
@@ -90,7 +89,6 @@ class ModelInput:
     max_gen_len: int | None = None
     inferenceConfig: dict[str, Any] | None = None
     toolConfig: dict[str, Any] | None = None
-
 
     def to_dict(self):
         """Convert to dict."""

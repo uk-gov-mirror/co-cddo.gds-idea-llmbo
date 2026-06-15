@@ -51,7 +51,7 @@ class MistralAdapter(ModelProviderAdapter):
         return "".join(prompt_parts)
 
     @classmethod
-    def build_tool(cls, output_model: type[BaseModel]) -> str: # type: ignore[override]
+    def build_tool(cls, output_model: type[BaseModel]) -> str:  # type: ignore[override]
         """Build a tool definition in Mistral's format.
 
         Args:
@@ -82,12 +82,7 @@ class MistralAdapter(ModelProviderAdapter):
         """
         cls.logger.debug("Preparing model input for Mistral")
 
-
-        original_prompt = (
-            model_input.messages[0].get("content", "")
-            if model_input.messages
-            else ""
-        )
+        original_prompt = model_input.messages[0].get("content", "") if model_input.messages else ""
         if not original_prompt:
             cls.logger.debug("Didnt find any content to adapt")
 
@@ -98,12 +93,9 @@ class MistralAdapter(ModelProviderAdapter):
         else:
             tool = None
 
-
         if model_input.messages:
             system = model_input.system if isinstance(model_input.system, str) else None
-            model_input.messages[0]["content"] = cls.format_mistral_prompt(
-                original_prompt, system, tool
-            )
+            model_input.messages[0]["content"] = cls.format_mistral_prompt(original_prompt, system, tool)
 
         # Mistral doesn't use anthropic_version, remove if set
         model_input.anthropic_version = None

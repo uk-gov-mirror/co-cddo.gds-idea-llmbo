@@ -18,7 +18,6 @@ class MistralFunctionAdapter(ModelProviderAdapter):
     4. Validating tool-use responses with granular debug logging.
     """
 
-
     logger = logging.getLogger(f"{__name__}.MistralFunctionAdapter")
 
     @classmethod
@@ -136,9 +135,7 @@ class MistralFunctionAdapter(ModelProviderAdapter):
         # Check that we stopped on purpose
         finish_reason = choice.get("finish_reason", "")
         if finish_reason != "tool_calls":
-            cls.logger.debug(
-                f"Expected 'tool_calls' as finish_reason, got '{finish_reason}'."
-            )
+            cls.logger.debug(f"Expected 'tool_calls' as finish_reason, got '{finish_reason}'.")
             return None
 
         # Check that the assistant returned a message
@@ -154,19 +151,14 @@ class MistralFunctionAdapter(ModelProviderAdapter):
             return None
 
         if len(tools) != 1:
-            cls.logger.debug(
-                f"Expected exactly 1 tool call, got {len(tools)}."
-            )
+            cls.logger.debug(f"Expected exactly 1 tool call, got {len(tools)}.")
             return None
 
         # Check tool name matches expected model
         function = tools[0].get("function", {})
         tool_name = function.get("name", "")
         if tool_name != output_model.__name__:
-            cls.logger.debug(
-                f"Wrong tool name in response, expected "
-                f"'{output_model.__name__}' got '{tool_name}'."
-            )
+            cls.logger.debug(f"Wrong tool name in response, expected '{output_model.__name__}' got '{tool_name}'.")
             return None
 
         # Parse and validate arguments
@@ -174,9 +166,7 @@ class MistralFunctionAdapter(ModelProviderAdapter):
             arguments = function.get("arguments", "{}")
             parsed_arguments = json.loads(arguments)
         except json.JSONDecodeError:
-            cls.logger.debug(
-                f"Failed to parse function arguments as JSON: {arguments}"
-            )
+            cls.logger.debug(f"Failed to parse function arguments as JSON: {arguments}")
             return None
 
         try:

@@ -64,13 +64,7 @@ class NovaAdapter(ModelProviderAdapter):
 
         # Converse API wraps tools inside a "toolSpec" and "inputSchema -> json"
         return {
-            "toolSpec": {
-                "name": output_model.__name__,
-                "description": description,
-                "inputSchema": {
-                    "json": parameters
-                }
-            }
+            "toolSpec": {"name": output_model.__name__, "description": description, "inputSchema": {"json": parameters}}
         }
 
     @classmethod
@@ -117,9 +111,7 @@ class NovaAdapter(ModelProviderAdapter):
             cls.logger.debug(f"Adding tool definition for {output_model.__name__}")
             tool_config = {
                 "tools": [cls.build_tool(output_model)],
-                "toolChoice": {
-                    "tool": {"name": output_model.__name__}
-                }
+                "toolChoice": {"tool": {"name": output_model.__name__}},
             }
             # Dynamically attach the toolConfig and delete the legacy keys
             model_input.toolConfig = tool_config

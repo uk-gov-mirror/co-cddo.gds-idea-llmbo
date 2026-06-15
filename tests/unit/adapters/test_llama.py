@@ -20,9 +20,7 @@ def test_format_llama_prompt_basic():
 
 def test_format_llama_prompt_with_system():
     """Test prompt formatting includes system block."""
-    result = LlamaAdapter.format_llama_prompt(
-        "Hello", system_prompt="Be helpful."
-    )
+    result = LlamaAdapter.format_llama_prompt("Hello", system_prompt="Be helpful.")
 
     assert "<|start_header_id|>system<|end_header_id|>" in result
     assert "Be helpful." in result
@@ -30,9 +28,7 @@ def test_format_llama_prompt_with_system():
 
 def test_format_llama_prompt_with_tools():
     """Test prompt formatting injects schema constraint."""
-    result = LlamaAdapter.format_llama_prompt(
-        "Hello", tools='{"type": "object"}'
-    )
+    result = LlamaAdapter.format_llama_prompt("Hello", tools='{"type": "object"}')
 
     assert "You must respond ONLY with a valid JSON object." in result
     assert '{"type": "object"}' in result

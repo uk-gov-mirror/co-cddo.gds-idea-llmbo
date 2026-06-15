@@ -107,9 +107,7 @@ def test_prepare_model_input_with_tool():
         messages=[{"role": "user", "content": "Test"}],
     )
 
-    result = OpenAICompatibleAdapter.prepare_model_input(
-        model_input, ExampleOutput
-    )
+    result = OpenAICompatibleAdapter.prepare_model_input(model_input, ExampleOutput)
 
     assert result.tools is not None
     assert len(result.tools) == 1
@@ -137,9 +135,7 @@ def test_validate_result_valid_native():
         ],
     }
 
-    result = OpenAICompatibleAdapter.validate_result(
-        valid_result, ExampleOutput
-    )
+    result = OpenAICompatibleAdapter.validate_result(valid_result, ExampleOutput)
     assert isinstance(result, ExampleOutput)
     assert result.name == "John"
     assert result.age == 30
@@ -162,9 +158,7 @@ def test_validate_result_valid_converse():
         },
     }
 
-    result = OpenAICompatibleAdapter.validate_result(
-        valid_result, ExampleOutput
-    )
+    result = OpenAICompatibleAdapter.validate_result(valid_result, ExampleOutput)
     assert isinstance(result, ExampleOutput)
     assert result.name == "Jane"
     assert result.age == 25
@@ -173,9 +167,7 @@ def test_validate_result_valid_converse():
 def test_validate_result_no_choices(caplog):
     """Test validate_result with no choices in native format."""
     with caplog.at_level("DEBUG"):
-        result = OpenAICompatibleAdapter.validate_result(
-            {"choices": []}, ExampleOutput
-        )
+        result = OpenAICompatibleAdapter.validate_result({"choices": []}, ExampleOutput)
 
     assert result is None
     assert "No 'choices' array found." in caplog.text
@@ -187,9 +179,7 @@ def test_validate_result_no_tool_calls(caplog):
         "choices": [{"message": {"content": "No tools here."}}],
     }
     with caplog.at_level("DEBUG"):
-        result = OpenAICompatibleAdapter.validate_result(
-            invalid_result, ExampleOutput
-        )
+        result = OpenAICompatibleAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
     assert "no tool_calls" in caplog.text
@@ -214,9 +204,7 @@ def test_validate_result_invalid_json(caplog):
         ],
     }
     with caplog.at_level("DEBUG"):
-        result = OpenAICompatibleAdapter.validate_result(
-            invalid_result, ExampleOutput
-        )
+        result = OpenAICompatibleAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
     assert "Validation failed:" in caplog.text
@@ -241,9 +229,7 @@ def test_validate_result_invalid_schema(caplog):
         ],
     }
     with caplog.at_level("DEBUG"):
-        result = OpenAICompatibleAdapter.validate_result(
-            invalid_result, ExampleOutput
-        )
+        result = OpenAICompatibleAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
     assert "Validation failed:" in caplog.text
@@ -265,9 +251,7 @@ def test_validate_result_converse_validation_error(caplog):
         },
     }
     with caplog.at_level("DEBUG"):
-        result = OpenAICompatibleAdapter.validate_result(
-            invalid_result, ExampleOutput
-        )
+        result = OpenAICompatibleAdapter.validate_result(invalid_result, ExampleOutput)
 
     assert result is None
     assert "Converse API validation failed:" in caplog.text
@@ -283,7 +267,5 @@ def test_validate_result_converse_no_tool_use():
         },
     }
 
-    result = OpenAICompatibleAdapter.validate_result(
-        invalid_result, ExampleOutput
-    )
+    result = OpenAICompatibleAdapter.validate_result(invalid_result, ExampleOutput)
     assert result is None

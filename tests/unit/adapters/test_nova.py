@@ -27,9 +27,7 @@ def test_build_tool_fallback_description():
     NoDocModel.__doc__ = ""
 
     tool = NovaAdapter.build_tool(NoDocModel)
-    assert "Extract structured data matching the NoDocModel schema." in (
-        tool["toolSpec"]["description"]
-    )
+    assert "Extract structured data matching the NoDocModel schema." in (tool["toolSpec"]["description"])
 
 
 def test_build_tool_inlines_defs():
@@ -46,9 +44,7 @@ def test_build_tool_inlines_defs():
         items: list[Inner]
 
     tool = NovaAdapter.build_tool(Outer)
-    items_prop = (
-        tool["toolSpec"]["inputSchema"]["json"]["properties"]["items"]
-    )
+    items_prop = tool["toolSpec"]["inputSchema"]["json"]["properties"]["items"]
 
     assert "$ref" not in items_prop.get("items", {})
 
@@ -81,9 +77,7 @@ def test_prepare_model_input_with_tool():
 
     assert result.toolConfig is not None
     assert len(result.toolConfig["tools"]) == 1
-    assert (
-        result.toolConfig["toolChoice"]["tool"]["name"] == "ExampleOutput"
-    )
+    assert result.toolConfig["toolChoice"]["tool"]["name"] == "ExampleOutput"
     assert result.tools is None
     assert result.tool_choice is None
 

@@ -32,17 +32,13 @@ class DeepSeekAdapter(OpenAICompatibleAdapter):
         Returns:
             dict[str, Any]: A tool definition dict.
         """
-        cls.logger.debug(
-            f"Building tool definition for model: {output_model.__name__}"
-        )
+        cls.logger.debug(f"Building tool definition for model: {output_model.__name__}")
 
         return {
             "type": "function",
             "function": {
                 "name": output_model.__name__,
-                "description": (
-                    output_model.__doc__ or "Please fill in the schema"
-                ),
+                "description": (output_model.__doc__ or "Please fill in the schema"),
                 "parameters": output_model.model_json_schema(),
             },
         }
@@ -69,9 +65,7 @@ class DeepSeekAdapter(OpenAICompatibleAdapter):
         cls.logger.debug(f"Preparing model input for {cls._provider_name}")
 
         if output_model:
-            cls.logger.debug(
-                f"Adding tool definition for {output_model.__name__}"
-            )
+            cls.logger.debug(f"Adding tool definition for {output_model.__name__}")
             model_input.tools = [cls.build_tool(output_model)]
             model_input.tool_choice = "required"
 
