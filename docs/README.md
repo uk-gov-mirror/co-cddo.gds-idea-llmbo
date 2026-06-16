@@ -11,8 +11,22 @@ You provide a model output as a pydantic model and llmbo creates takes care of t
 
 See the AWS documentation for [models that support batch inference.](https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference-supported.html)
 
-Currently the library has full support (including StructuredBatchInference) for Anthropic and Mistral models. 
-Other models may be supported through the default adapter, or you can write and register your own. 
+The library includes built-in adapters for the following model families:
+
+| Adapter | Models | Approach |
+|---|---|---|
+| `AnthropicAdapter` | Claude (Anthropic) | Native tool use |
+| `MistralAdapter` | Mistral / Mixtral (legacy prompt injection) | JSON extraction from text |
+| `MistralFunctionAdapter` | Mistral / Mixtral (function calling) | Native tool use |
+| `OpenAIAdapter` | OpenAI-compatible models | Native tool use |
+| `DeepSeekAdapter` | DeepSeek | Native tool use |
+| `QwenAdapter` | Alibaba Qwen | Native tool use |
+| `LlamaAdapter` | Meta Llama 3 / 4 | JSON extraction from text |
+| `NovaAdapter` | Amazon Nova (Converse API) | Native tool use |
+
+Adapters are auto-selected at runtime based on the model ID you pass to `BatchInferer`.
+Other models may be supported through the default adapter, or you can write and register your own
+(see `src/llmbo/adapters/base.py`).
 
 
 ## Prerequisites 
