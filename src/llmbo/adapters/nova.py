@@ -73,8 +73,9 @@ class NovaAdapter(ModelProviderAdapter):
 
         Reshapes the standard ``ModelInput`` into the Converse API
         format: messages become content-block arrays, the system prompt
-        becomes a text array, ``max_tokens`` moves into
-        ``inferenceConfig``, and tools are wrapped in ``toolConfig``.
+        becomes a text array, and sampling parameters (max_tokens,
+        temperature, top_p) move into inferenceConfig. Nova does not
+        support top_k, so it is dropped.
 
         Args:
             model_input (ModelInput): The original model input.
@@ -101,10 +102,26 @@ class NovaAdapter(ModelProviderAdapter):
         if model_input.system and isinstance(model_input.system, str):
             model_input.system = [{"text": model_input.system}]
 
-        # 3. Reshape max_tokens into inferenceConfig
+        # 3. Reshape sampling params into inferenceConfig
+        #    The Converse API rejects top-level temperature/top_p, so they
+        #    must be nested. top_k is unsupported by Nova and is dropped.
+        inference_config: dict[str, Any] = {}
         if model_input.max_tokens:
-            model_input.inferenceConfig = {"maxTokens": model_input.max_tokens}
-            model_input.max_tokens = None
+            inference_config["maxTokens"] = model_input.max_tokens
+        if model_input.temperature is not None:
+            inference_config["temperature"] = model_input.temperature
+        if model_input.top_p is not None:
+            inference_config["topP"] = model_input.top_p
+
+        if inference_config:
+            model_input.inferenceConfig = inference_config
+
+        # Remove the top-level keys so to_dict() does not emit them.
+        # top_k is nulled (not routed) as Nova's Converse API rejects it.
+        model_input.max_tokens = None
+        model_input.temperature = None
+        model_input.top_p = None
+        model_input.top_k = None
 
         # 4. Reshape tools into toolConfig
         if output_model:

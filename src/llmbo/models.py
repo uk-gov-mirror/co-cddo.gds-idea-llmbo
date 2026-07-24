@@ -67,6 +67,10 @@ class ModelInput:
             configuration for Converse API models (e.g. Nova).
         toolConfig (dict[str, Any] | None): Tool configuration for
             Converse API models (e.g. Nova).
+        additionalModelRequestFields (dict[str, Any] | None): Extra
+            provider request fields for Converse API models; used for
+            parameters like topK that live outside inferenceConfig
+            (e.g. Nova).
     """
 
     # These are required
@@ -89,6 +93,7 @@ class ModelInput:
     max_gen_len: int | None = None
     inferenceConfig: dict[str, Any] | None = None
     toolConfig: dict[str, Any] | None = None
+    additionalModelRequestFields: dict[str, Any] | None = None
 
     def to_dict(self):
         """Convert to dict."""
