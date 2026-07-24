@@ -149,3 +149,37 @@ def test_validate_result_empty_output():
     """Test validate_result with empty result."""
     result = NovaAdapter.validate_result({}, ExampleOutput)
     assert result is None
+
+
+def test_prepare_model_input_nests_sampling_params():
+    """Test that temperature and top_p are nested into inferenceConfig."""
+    model_input = ModelInput(
+        messages=[{"role": "user", "content": "Test"}],
+        max_tokens=8192,
+        temperature=0.3,
+        top_p=0.9,
+    )
+
+    result = NovaAdapter.prepare_model_input(model_input)
+
+    assert result.inferenceConfig == {
+        "maxTokens": 8192,
+        "temperature": 0.3,
+        "topP": 0.9,
+    }
+    assert result.temperature is None
+    assert result.top_p is None
+    assert result.max_tokens is None
+
+
+def test_prepare_model_input_drops_top_k():
+    """Test that top_k is dropped, as Nova's Converse API rejects it."""
+    model_input = ModelInput(
+        messages=[{"role": "user", "content": "Test"}],
+        top_k=40,
+    )
+
+    result = NovaAdapter.prepare_model_input(model_input)
+
+    assert result.top_k is None
+    assert result.additionalModelRequestFields is None
