@@ -1,4 +1,13 @@
-from .adapters import AnthropicAdapter, MistralAdapter
+from .adapters import (
+    AnthropicAdapter,
+    DeepSeekAdapter,
+    LlamaAdapter,
+    MistralAdapter,
+    MistralFunctionAdapter,
+    NovaAdapter,
+    OpenAIAdapter,
+    QwenAdapter,
+)
 from .batch_inferer import BatchInferer
 from .models import (
     Manifest,
@@ -15,13 +24,27 @@ except ImportError:  # pragma: no cover
 
 # Register the model adapters
 ModelAdapterRegistry.register(r"(anthropic|claude)", AnthropicAdapter)
-ModelAdapterRegistry.register(r"(mistral|mixtral)", MistralAdapter)
+ModelAdapterRegistry.register(r"(mistral|mixtral)", MistralFunctionAdapter)
+ModelAdapterRegistry.register(r"deepseek", DeepSeekAdapter)
+ModelAdapterRegistry.register(r"(meta\.llama)", LlamaAdapter)
+ModelAdapterRegistry.register(r"openai", OpenAIAdapter)
+ModelAdapterRegistry.register(r"qwen", QwenAdapter)
+ModelAdapterRegistry.register(r"(amazon\.nova)", NovaAdapter)
+
 
 __all__ = [
+    "AnthropicAdapter",
     "BatchInferer",
+    "DeepSeekAdapter",
+    "LlamaAdapter",
     "Manifest",
+    "MistralAdapter",
+    "MistralFunctionAdapter",
     "ModelAdapterRegistry",
     "ModelInput",
+    "NovaAdapter",
+    "OpenAIAdapter",
+    "QwenAdapter",
     "StructuredBatchInferer",
     "ToolChoice",
     "__version__",

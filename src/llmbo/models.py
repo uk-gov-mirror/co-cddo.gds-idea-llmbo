@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -36,29 +36,49 @@ class ModelInput:
     """Configuration class for AWS Bedrock model inputs.
 
     This class defines the structure and parameters for model invocation requests
-    following AWS Bedrock's expected format.
+    following AWS Bedrock's expected format. Provider-specific adapters may
+    reshape or nullify fields as needed for their API.
 
     See https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html
 
     Attributes:
-        messages (List[dict]): List of message objects with role and content
-        anthropic_version (str): Version string for Anthropic models
-        max_tokens (int): Maximum number of tokens in the response
-        system (Optional[str]): System message for the model
-        stop_sequences (Optional[List[str]]): Custom stop sequences
-        temperature (Optional[float]): Sampling temperature
-        top_p (Optional[float]): Nucleus sampling parameter
-        top_k (Optional[int]): Top-k sampling parameter
-        tools (Optional[List[dict]]): Tool definitions for structured outputs
-        tool_choice (Optional[ToolChoice]): Tool selection configuration
+        messages (list[dict] | None): List of message objects with role
+            and content. Defaults to None.
+        anthropic_version (str | None): Version string for Anthropic
+            models. Defaults to "bedrock-2023-05-31".
+        max_tokens (int | None): Maximum number of tokens in the
+            response. Defaults to 2000.
+        system (str | list[dict[str, Any]] | None): System message for
+            the model. A string for most providers; reshaped to a list
+            of content blocks for Converse API models (e.g. Nova).
+        stop_sequences (list[str] | None): Custom stop sequences.
+        temperature (float | None): Sampling temperature.
+        top_p (float | None): Nucleus sampling parameter.
+        top_k (int | None): Top-k sampling parameter.
+        tools (list[dict] | None): Tool definitions for structured
+            outputs.
+        tool_choice (ToolChoice | str | None): Tool selection
+            configuration.
+        prompt (str | None): Native text prompt for models that use a
+            single string instead of a messages array (e.g. Llama).
+        max_gen_len (int | None): Maximum generation length for models
+            that use this parameter instead of max_tokens (e.g. Llama).
+        inferenceConfig (dict[str, Any] | None): Inference
+            configuration for Converse API models (e.g. Nova).
+        toolConfig (dict[str, Any] | None): Tool configuration for
+            Converse API models (e.g. Nova).
+        additionalModelRequestFields (dict[str, Any] | None): Extra
+            provider request fields for Converse API models; used for
+            parameters like topK that live outside inferenceConfig
+            (e.g. Nova).
     """
 
     # These are required
-    messages: list[dict]
-    anthropic_version: str = "bedrock-2023-05-31"
-    max_tokens: int = 2000
+    messages: list[dict] | None = None
+    anthropic_version: str | None = "bedrock-2023-05-31"
+    max_tokens: int | None = 2000
 
-    system: str | None = None
+    system: str | list[dict[str, Any]] | None = None
     stop_sequences: list[str] | None = None
     temperature: float | None = None
     top_p: float | None = None
@@ -66,6 +86,14 @@ class ModelInput:
 
     tools: list[dict] | None = None
     tool_choice: ToolChoice | str | None = None
+
+    # Provider-specific fields (used by adapters that diverge from the
+    # Anthropic / Messages API shape, e.g. Llama, Nova)
+    prompt: str | None = None
+    max_gen_len: int | None = None
+    inferenceConfig: dict[str, Any] | None = None
+    toolConfig: dict[str, Any] | None = None
+    additionalModelRequestFields: dict[str, Any] | None = None
 
     def to_dict(self):
         """Convert to dict."""

@@ -4,7 +4,8 @@ dynamic = ["version"]
 description = "Large Language Model Batch Operations"
 readme = "docs/README.md"
 authors = [
-    { name = "David Gillespie", email = "david.gillespie@digital.cabinet-office.gov.uk" }
+    { name = "David Gillespie", email = "david.gillespie@dsit.gov.uk"},
+    { name = "Michael Hollins", email = "michael.hollins@dsit.gov.uk"},
 ]
 requires-python = ">=3.10"
 dependencies = [
